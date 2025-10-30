@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A2A Agent Dashboard</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        h1 { color: #2277aa }
+        .status { margin-bottom: 1.2em; }
+        table, th, td { border: 1px solid #cccccc; border-collapse: collapse; padding: 0.4em; }
+        th { background: #e0ecf7; }
+        .suggestions { margin-top: 1.2em; }
+        .status-ok { color: green; }
+        .status-bad { color: darkred; }
+        .json-block { font-family: monospace; background: #f6f6f6; padding: 0.5em; }
+    </style>
+</head>
+<body>
+    <h1>Site Crawler A2A Agent</h1>
+    <div class="status">
+        <b>Agent status:</b><br>
+        Last crawl target: <span class="json-block">{{ last_target or '-' }}</span><br>
+        Last interval: <span class="json-block">{{ last_interval or '-' }}</span><br>
+        Last max_concurrent: <span class="json-block">{{ last_max_concurrent or '-' }}</span><br>
+        Last run: <span class="json-block">{{ last_timestamp or '-' }}</span>
+    </div>
+    <div class="status">
+        <b>MCP Tool status:</b>
+        {% if mcp_ok %}
+          <span class="status-ok">Reachable &#10004;</span>
+        {% else %}
+          <span class="status-bad">Unreachable &#10008;</span>
+        {% endif %}
+    </div>
+    <div class="report">
+        <h3>Latest Crawl Report</h3>
+        {% if crawl %}
+        <table>
+          <tr><th colspan="2">HTTP 200</th><th colspan="2">Non-200 (not 3xx)</th></tr>
+          <tr><th>uri</th><th>status</th><th>uri</th><th>status</th></tr>
+            {% set max_rows = [crawl['http_200']|length, crawl['http_non200']|length]|max %}
+            {% for i in range(max_rows) %}
+                <tr>
+                <td>{{ crawl['http_200'][i]['uri'] if i < crawl['http_200']|length else '' }}</td>
+                <td>{{ crawl['http_200'][i]['status'] if i < crawl['http_200']|length else '' }}</td>
+                <td>{{ crawl['http_non200'][i]['uri'] if i < crawl['http_non200']|length else '' }}</td>
+                <td>{{ crawl['http_non200'][i]['status'] if i < crawl['http_non200']|length else '' }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <i>No crawl completed yet.</i>
+        {% endif %}
+    </div>
+    <div class="suggestions">
+        <h3>Suggestions:</h3>
+        <ul>
+            {% if suggestions %}
+                {% for s in suggestions %}
+                  <li>{{ s }}</li>
+                {% endfor %}
+            {% else %}
+                <li><i>No suggestions yet.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="files">
+        <h3>Result Files</h3>
+        {% if file_links %}
+        <ul>
+          {% for file in file_links %}
+            <li>
+                <a href="{{ file.url }}" target="_blank" rel="noopener">{{ file.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+          <i>No result files yet.</i>
+        {% endif %}
+    </div>
+</body>
+</html>
