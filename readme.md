@@ -96,6 +96,48 @@ It exposes both a CLI interface and an A2A HTTP+JSON/JSON-RPC protocol service (
 
 ---
 
+## MCP Server Instructions (V2 - URL Analysis)
+
+This project includes two advanced agents for analyzing failing URLs and identifying codebase culprits:
+
+### Analyzer Agent (http://localhost:9100)
+The `urlstatus/analyzer_agent.py` service analyzes web crawl failures and suggests fixes using an OpenAI-compatible LLM. To run:
+
+1. Install dependencies (if not already done):  
+   ```
+   pip install -r requirements.txt
+   ```
+
+2. Start the analyzer agent:  
+   ```
+   python urlstatus/analyzer_agent.py
+   ```
+
+3. The service will be available at `http://localhost:9100/v1` and serves its AgentCard at `http://localhost:9100/.well-known/agent-card.json`
+
+### GitHub Code Analysis Agent (http://localhost:9200)
+The `urlstatus/github_code_agent.py` service finds backend GitHub source for failing endpoints and proposes fixes. To run:
+
+1. Set your GitHub credentials in environment variables:
+   ```
+   export GITHUB_REPO="YOUR_ORG/YOUR_REPO"
+   export GITHUB_TOKEN="your_github_personal_access_token"
+   ```
+
+2. Install dependencies (if not already done):  
+   ```
+   pip install -r requirements.txt
+   ```
+
+3. Start the GitHub code analysis agent:  
+   ```
+   python urlstatus/github_code_agent.py
+   ```
+
+4. The service will be available at `http://localhost:9200/v1` and serves its AgentCard at `http://localhost:9200/.well-known/agent-card.json`
+
+These V2 agents extract URLs from crawl reports and pass them to dedicated analysis agents that search for failing URL patterns in the codebase, enabling comprehensive root cause analysis and automated fix recommendations.
+
 ## License
 
 MIT or Apache 2.0 (insert your preferred license here)
